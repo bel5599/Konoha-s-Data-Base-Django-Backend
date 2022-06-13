@@ -1,10 +1,6 @@
 from rest_framework import serializers
-from .models import BestiaMisionPergaminoLlave, BestiaMitica, Chunin, Equipo, EquipoEnMision, EquipoEnMisionPergamino, Genin, Jounin, Mision, Ninja, NinjaMedico, NinjaTecnica, Pergamino, Persona, Task, Tecnica, TecnicaAtaque, TecnicaCurativa
+from .models import BestiaMisionPergaminoLlave, BestiaMitica, Chunin, Equipo, EquipoEnMision, EquipoEnMisionPergamino, Genin, Jounin, Mision, Ninja, NinjaMedico, NinjaTecnica, Pergamino, Persona, Tecnica, TecnicaAtaque, TecnicaCurativa
 
-class TaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        fields = '__all__'
 class PersonaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Persona

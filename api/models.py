@@ -1,12 +1,6 @@
 from email.policy import default
 from django.db import models
 from datetime import date
-# Create your models here.
-class Task(models.Model):
-    title = models.CharField(max_length=200)
-    completed = models.BooleanField(default=False, blank=True, null=True)
-    def __str__(self) -> str:
-        return self.title
 class Persona(models.Model):
     nombre = models.CharField(max_length=50, default="")
     edad = models.IntegerField(default=12)

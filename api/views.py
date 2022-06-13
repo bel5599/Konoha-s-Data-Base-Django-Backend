@@ -11,9 +11,6 @@ from .models import BestiaMisionPergaminoLlave, BestiaMitica, Chunin, Equipo, Eq
 @api_view(['GET'])
 def apiOverview(request):
     api_urls = {
-        'Task-List': '/tasks/',
-        'Task-Detail': '/tasks/<str:pk>',
-
         'Persona-List': '/personas/',
         'Persona-Detail': '/personas/<str:pk>',
         
