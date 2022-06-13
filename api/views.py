@@ -4,9 +4,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import BestiaMisionPergaminoLlaveSerializer, BestiaMiticaSerializer, ChuninSerializer, EquipoEnMisionPergaminoSerializer, EquipoEnMisionSerializer, EquipoSerializer, GeninSerializer, JouninSerializer, MisionSerializer, NinjaSerializer, NinjaTecnicaSerializer, PergaminoSerializer, PersonaSerializer, TaskSerializer, TecnicaAtaqueSerializer, TecnicaCurativaSerializer, TecnicaSerializer
+from .serializers import BestiaMisionPergaminoLlaveSerializer, BestiaMiticaSerializer, ChuninSerializer, EquipoEnMisionPergaminoSerializer, EquipoEnMisionSerializer, EquipoSerializer, GeninSerializer, JouninSerializer, MisionSerializer, NinjaSerializer, NinjaTecnicaSerializer, PergaminoSerializer, PersonaSerializer, TecnicaAtaqueSerializer, TecnicaCurativaSerializer, TecnicaSerializer
 
-from .models import BestiaMisionPergaminoLlave, BestiaMitica, Chunin, Equipo, EquipoEnMision, EquipoEnMisionPergamino, Genin, Jounin, Mision, Ninja, NinjaTecnica, Pergamino, Persona, Task, Tecnica, TecnicaAtaque, TecnicaCurativa
+from .models import BestiaMisionPergaminoLlave, BestiaMitica, Chunin, Equipo, EquipoEnMision, EquipoEnMisionPergamino, Genin, Jounin, Mision, Ninja, NinjaTecnica, Pergamino, Persona, Tecnica, TecnicaAtaque, TecnicaCurativa
 # Create your views here.
 @api_view(['GET'])
 def apiOverview(request):
@@ -93,13 +93,6 @@ def get_put_delete(request, pk, clase, serializador):
         objeto.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-#tasks
-@api_view(['GET','POST'])
-def task_list(request):
-    return get_post(request, Task, TaskSerializer)
-@api_view(['GET','PUT','DELETE'])
-def task_detail(request,pk):
-    return get_put_delete(request, pk, Task, TaskSerializer)
 
 #personas
 @api_view(['GET','POST'])
