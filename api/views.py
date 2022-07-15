@@ -65,6 +65,7 @@ def get_post(request, clase, serializador):
     if request.method == 'GET':
         objects = clase.objects.all()
         serializer = serializador(objects, many=True)
+        # print(serializer.data)
         return Response(serializer.data)
     elif request.method == 'POST':
         serializer = serializador(data=request.data)
@@ -93,10 +94,26 @@ def get_put_delete(request, pk, clase, serializador):
         objeto.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+def ninjas_medicos_mujeres(request, clase, serializador):
+    try:
+        objeto = NinjaTecnica.objects.filter(tecnica=)
+        # ninjas = Ninja
+        # personas=[item.id for item in objeto]
+        # ninjas = [Ninja.objects.filter(id = item) for item in personas]
+        print(objeto)
+        # serializer = serializador(objeto, many=True)
+        return objeto#serializer.data
+    except Exception as e:
+        print(e)
+    
+
+
 
 #personas
 @api_view(['GET','POST'])
 def persona_list(request):
+    print(request)
+    print(ninjas_medicos_mujeres(request,Persona,PersonaSerializer))
     return get_post(request, Persona, PersonaSerializer)
 @api_view(['GET','PUT','DELETE'])
 def persona_detail(request,pk):
