@@ -1,12 +1,14 @@
 from django.shortcuts import render
 
+from django.db.models import Q
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
 from .serializers import BestiaMisionPergaminoLlaveSerializer, BestiaMiticaSerializer, ChuninSerializer, EquipoEnMisionPergaminoSerializer, EquipoEnMisionSerializer, EquipoSerializer, GeninSerializer, JouninSerializer, MisionSerializer, NinjaSerializer, NinjaTecnicaSerializer, PergaminoSerializer, PersonaSerializer, TecnicaAtaqueSerializer, TecnicaCurativaSerializer, TecnicaSerializer
 
-from .models import BestiaMisionPergaminoLlave, BestiaMitica, Chunin, Equipo, EquipoEnMision, EquipoEnMisionPergamino, Genin, Jounin, Mision, Ninja, NinjaTecnica, Pergamino, Persona, Tecnica, TecnicaAtaque, TecnicaCurativa
+from .models import BestiaMisionPergaminoLlave, BestiaMitica, Chunin, Equipo, EquipoEnMision, EquipoEnMisionPergamino, Genin, Jounin, Mision, Ninja, NinjaTecnica, NinjaMedico, Pergamino, Persona, Tecnica, TecnicaAtaque, TecnicaCurativa
 # Create your views here.
 @api_view(['GET'])
 def apiOverview(request):
@@ -94,20 +96,94 @@ def get_put_delete(request, pk, clase, serializador):
         objeto.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-def ninjas_medicos_mujeres(request, clase, serializador):
-    try:
-        objeto = NinjaTecnica.objects.filter(tecnica=)
-        # ninjas = Ninja
-        # personas=[item.id for item in objeto]
-        # ninjas = [Ninja.objects.filter(id = item) for item in personas]
-        print(objeto)
-        # serializer = serializador(objeto, many=True)
-        return objeto#serializer.data
-    except Exception as e:
-        print(e)
+# def ninjas_medicos_mujeres(request, clase, serializador):
+#     try:
+#         objeto = NinjaTecnica.objects.filter(tecnica=)
+#         # ninjas = Ninja
+#         # personas=[item.id for item in objeto]
+#         # ninjas = [Ninja.objects.filter(id = item) for item in personas]
+#         print(objeto)
+#         # serializer = serializador(objeto, many=True)
+#         return objeto#serializer.data
+#     except Exception as e:
+#         print(e)
+def female_medical_ninjas(request,class_,serializador):
+    female_medical_ninjas=NinjaMedico.objects.filter(sexo='F')
+    medical_ninjas=NinjaMedico.objects.all()
+    percent=(len(female_medical_ninjas) * 100) / len(medical_ninjas)
     
+def captain_in_C_rank_missions(request, class_, serializador):
+    team_on_mission=EquipoEnMision.objects.all()
+    captain_missions=[(item.capitan,item.mision) for item in team_on_mission
+                     if item.mision.rango== 'B' or item.mision.rango=='A' or item.mision.rango=='S']
+    dicc=dict()
+    for item in captain_missions:
+        if dicc.has_key(item[0]):
+            dicc[item[0]]=dicc[item[0]]+1
+        else:
+            dicc.setdefault(item[0],1)
+    captain_list={captain for (captain,missions) in dicc.items() if missions>3}
+    
+def ninja_invocation_in_S_rank_missions(request, class_,serializador):
+    team_on_mission=EquipoEnMision.objects.all()
+    ninjas_S_rank_missions=[(item.equipo,item.capitan) for item in team_on_mission if item.mision.rango==S]
+    dicc=dict()
+    for item in ninjas_S_rank_missions:
+        if dicc.has_key(item[0].ninja1):
+            dicc[item[0].ninja1]=dicc[item[0].ninja1]+1
+        else:
+            dicc.setdefault(item[0].ninja1,1)
+        if dicc.has_key(item[0].ninja2):
+            dicc[item[0].ninja2]=dicc[item[0].ninja2]+1
+        else:
+            dicc.setdefault(item[0].ninja2,1)
+        if dicc.has_key(item[0].ninjamedico):
+            dicc[item[0].ninjamedico]=dicc[item[0].ninjamedico]+1
+        else:
+            dicc.setdefault(item[0].ninjamedico,1)
+        if dicc.has_key(item[1]):
+            dicc[item[1]]=dicc[item[1]]+1
+        else:
+            dicc.setdefault(item[1],1)
+    ninjas=[ninja for (ninja,missions) in dicc.items() if missions>6]
+    ninjas_invocation=[(item.invocador.nombre,item.invocador.clan,item.nombre) for item in BestiaMitica if ninjas.__contains__(item.invocador)]
 
+def hidden_techniques(request,class_,serializador):
+    foreign_missions=EquipoEnMision.objects.filter(mision_in=[mision.id for mision in Mision.objects.filter(~Q(pais_cliente="Konoa"))])
+    ocult_technique=NinjaTecnica.objects.filter(tecnica_in=[tecnica.id for tecnica in Tecnica.objects.filter(es_oculta=True)])
+    dicc=dict()
+    for (ninja,tecnica) in ocult_technique:
+        for item in foreign_missions:
+            if item.capitan==ninja:
+                if dicc.has_key(item.capitan):
+                    dicc[item.capitan].add(tecnica)
+                else:
+                    dicc.setdefault(item.capitan,tecnica)
+            elif item.equipo.ninja1==ninja:
+                if dicc.has_key(item.equipo.ninja1):
+                    dicc[item.equipo.ninja1].add(tecnica)
+                else:
+                    dicc.setdefault(item.equipo.ninja1,tecnica)
+            elif item.equipo.ninja2==ninja:
+                if dicc.has_key(item.equipo.ninja2):
+                    dicc[item.equipo.ninja2].add(tecnica)
+                else:
+                    dicc.setdefault(item.equipo.ninja2,tecnica)
+            elif item.equipo.ninjamedico==ninja:
+                if dicc.has_key(item.equipo.ninjamedico):
+                    dicc[item.equipo.ninjamedico].add(tecnica)
+                else:
+                    dicc.setdefault(item.equipo.ninjamedico,tecnica)
+    hidden_techn=dicc.values()
+            
+def medical_ninja_captains(request,class_,serializador):
+    medical_ninja=NinjaMedico.objects.all()
+    team_on_mission=EquipoEnMision.objects.all()
+    medical_captain=[item.capitan for item in team_on_mission if medical_ninja.__contains__(item.capitan)]
 
+def highest_reward_missions(request, class_, serializador):
+    satisfactory_mission=EquipoEnMision.objects.filter(resultado='S').order_by(mision.recompensa)
+    missions=satisfactory_mission.order_by()
 
 #personas
 @api_view(['GET','POST'])
