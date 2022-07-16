@@ -24,6 +24,9 @@ urlpatterns = [
     
     path('tecnicas-ataque/', views.tecnica_ataque_list, name='tecnicas-ataque'),
     path('tecnicas-ataque/<str:pk>/', views.tecnica_ataque_detail, name='tecnica-ataque_detail'),
+
+    path('ninjas-medicos/', views.ninja_medico_list, name='ninjas-medicos'),
+    path('ninjas-medicos/<str:pk>/', views.ninja_medico_detail, name='ninja-medico_detail'),
     
     path('tecnicas-curativas/', views.tecnica_curativa_list, name='tecnicas-curativas'),
     path('tecnicas-curativas/<str:pk>/', views.tecnica_curativa_detail, name='tecnica-curativa_detail'),

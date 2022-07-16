@@ -1,21 +1,54 @@
 from django.shortcuts import render
 
-from django.db.models import Q
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import BestiaMisionPergaminoLlaveSerializer, BestiaMiticaSerializer, ChuninSerializer, EquipoEnMisionPergaminoSerializer, EquipoEnMisionSerializer, EquipoSerializer, GeninSerializer, JouninSerializer, MisionSerializer, NinjaSerializer, NinjaTecnicaSerializer, PergaminoSerializer, PersonaSerializer, TecnicaAtaqueSerializer, TecnicaCurativaSerializer, TecnicaSerializer
+# Todos los serializadores
+from api.serializers.PersonaSerializer import PersonaSerializer
+from api.serializers.NinjaSerializer import NinjaSerializer
+from api.serializers.GeninSerializer import GeninSerializer
+from api.serializers.ChuninSerializer import ChuninSerializer
+from api.serializers.TecnicaSerializer import TecnicaSerializer
+from api.serializers.TecnicaCurativaSerializer import TecnicaCurativaSerializer
+from api.serializers.TecnicaAtaqueSerializer import TecnicaAtaqueSerializer
+from api.serializers.NinjaMedicoSerializer import NinjaMedicoSerializer
+from api.serializers.NinjaTecnicaSerializer import NinjaTecnicaSerializer
+from api.serializers.EquipoSerializer import EquipoSerializer
+from api.serializers.BestiaMiticaSerializer import BestiaMiticaSerializer
+from api.serializers.BestiaMisionPergaminoSerializer import BestiaMisionPergaminoSerializer
+from api.serializers.EquipoEnMisionSerializer import EquipoEnMisionSerializer
+from api.serializers.EquipoEnMisionPergaminoSerializer import EquipoEnMisionPergaminoSerializer
+from api.serializers.JouninSerializer import JouninSerializer
+from api.serializers.MisionSerializer import MisionSerializer
+from api.serializers.PergaminoSerializer import PergaminoSerializer
 
-from .models import BestiaMisionPergaminoLlave, BestiaMitica, Chunin, Equipo, EquipoEnMision, EquipoEnMisionPergamino, Genin, Jounin, Mision, Ninja, NinjaTecnica, NinjaMedico, Pergamino, Persona, Tecnica, TecnicaAtaque, TecnicaCurativa
+# Todos los modelos
+from api.models.Persona import Persona
+from api.models.Ninja import Ninja
+from api.models.Genin import Genin
+from api.models.Chunin import Chunin
+from api.models.Tecnica import Tecnica
+from api.models.TecnicaCurativa import TecnicaCurativa
+from api.models.TecnicaAtaque import TecnicaAtaque
+from api.models.NinjaMedico import NinjaMedico
+from api.models.NinjaTecnica import NinjaTecnica
+from api.models.Equipo import Equipo
+from api.models.BestiaMitica import BestiaMitica
+from api.models.BestiaMisionPergamino import BestiaMisionPergamino
+from api.models.EquipoEnMision import EquipoEnMision
+from api.models.EquipoEnMisionPergamino import EquipoEnMisionPergamino
+from api.models.Jounin import Jounin
+from api.models.Mision import Mision
+from api.models.Pergamino import Pergamino
+
 # Create your views here.
 @api_view(['GET'])
 def apiOverview(request):
     api_urls = {
         'Persona-List': '/personas/',
         'Persona-Detail': '/personas/<str:pk>',
-        
+
         'Ninja-List': '/ninjas/',
         'Ninja-Detail': '/ninjas/<str:pk>',
         
@@ -39,9 +72,7 @@ def apiOverview(request):
         
         'Ninja-Tecnica-List': '/ninjas-tecnicas/',
         'Ninja-Tecnica-Detail': '/ninjas-tecnicas/<str:pk>',
-        
-        'Bestia-Mitica-List': '/bestias-miticas/',
-        'Bestia-Mitica-Detail': '/bestias-miticas/<str:pk>',
+        'Bestia-Mitica-List': '/bestias-miticas/', 'Bestia-Mitica-Detail': '/bestias-miticas/<str:pk>',
         
         'Equipo-List': '/equipos/',
         'Equipo-Detail': '/equipos/<str:pk>',
@@ -67,7 +98,6 @@ def get_post(request, clase, serializador):
     if request.method == 'GET':
         objects = clase.objects.all()
         serializer = serializador(objects, many=True)
-        # print(serializer.data)
         return Response(serializer.data)
     elif request.method == 'POST':
         serializer = serializador(data=request.data)
@@ -96,17 +126,6 @@ def get_put_delete(request, pk, clase, serializador):
         objeto.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# def ninjas_medicos_mujeres(request, clase, serializador):
-#     try:
-#         objeto = NinjaTecnica.objects.filter(tecnica=)
-#         # ninjas = Ninja
-#         # personas=[item.id for item in objeto]
-#         # ninjas = [Ninja.objects.filter(id = item) for item in personas]
-#         print(objeto)
-#         # serializer = serializador(objeto, many=True)
-#         return objeto#serializer.data
-#     except Exception as e:
-#         print(e)
 def female_medical_ninjas(request,class_,serializador):
     female_medical_ninjas=NinjaMedico.objects.filter(sexo='F')
     medical_ninjas=NinjaMedico.objects.all()
@@ -183,13 +202,12 @@ def medical_ninja_captains(request,class_,serializador):
 
 def highest_reward_missions(request, class_, serializador):
     satisfactory_mission=EquipoEnMision.objects.filter(resultado='S').order_by(mision.recompensa)
-    missions=satisfactory_mission.order_by()
+    missions=satisfactory_mission.values_list('mision',flat=True).order_by('recompensa')
+
 
 #personas
 @api_view(['GET','POST'])
 def persona_list(request):
-    print(request)
-    print(ninjas_medicos_mujeres(request,Persona,PersonaSerializer))
     return get_post(request, Persona, PersonaSerializer)
 @api_view(['GET','PUT','DELETE'])
 def persona_detail(request,pk):
@@ -242,6 +260,14 @@ def tecnica_ataque_list(request):
 @api_view(['GET','PUT','DELETE'])
 def tecnica_ataque_detail(request,pk):
     return get_put_delete(request, pk, TecnicaAtaque, TecnicaAtaqueSerializer)
+
+#tecnicas ataque
+@api_view(['GET','POST'])
+def ninja_medico_list(request):
+    return get_post(request, NinjaMedico, NinjaMedicoSerializer)
+@api_view(['GET','PUT','DELETE'])
+def ninja_medico_detail(request,pk):
+    return get_put_delete(request, pk, NinjaMedico, NinjaMedicoSerializer)
 
 #tecnicas curativas
 @api_view(['GET','POST'])
@@ -310,7 +336,7 @@ def equipo_en_mision_pergamino_detail(request,pk):
 #bestias misiones pergamino
 @api_view(['GET','POST'])
 def bestia_mision_pergamino_list(request):
-    return get_post(request, BestiaMisionPergaminoLlave, BestiaMisionPergaminoLlaveSerializer)
+    return get_post(request, BestiaMisionPergamino, BestiaMisionPergaminoSerializer)
 @api_view(['GET','PUT','DELETE'])
 def bestia_mision_pergamino_detail(request,pk):
-    return get_put_delete(request, pk, BestiaMisionPergaminoLlave, BestiaMisionPergaminoLlaveSerializer)
+    return get_put_delete(request, pk, BestiaMisionPergamino, BestiaMisionPergaminoSerializer)
